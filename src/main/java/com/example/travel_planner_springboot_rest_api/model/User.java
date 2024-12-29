@@ -6,12 +6,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "users")
 public class User {
 
-    @Id
-    private String id;
-    private String username;
-    private String email;
-    private String password;
-    private String role = "USER"; // Default role assigned to every new user
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
     // Constructors
     public User() {}
@@ -21,6 +22,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = "USER"; // Default role assignment
+
     }
 
     // Getters and Setters
@@ -63,4 +65,12 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+
+    @Id
+    private String id;
+    private String username;
+    private String email;
+    private String password;
+    private String role = "USER"; // Default role assigned to every new user
+    private String refreshToken; // Store refresh token for logout
 }
