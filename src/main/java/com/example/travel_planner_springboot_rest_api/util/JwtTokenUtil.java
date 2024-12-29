@@ -18,6 +18,9 @@ public class JwtTokenUtil {
     private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(
             "a2uIfiIoTNM4+TunIiQjyuRPaLvtnbtncEFNo6A9TnU="));
 
+    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1 hour
+    private final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 days
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -35,17 +38,20 @@ public class JwtTokenUtil {
                 .getBody();
     }
 
-    public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+    public String generateAccessToken(String username) {
+        return createToken(new HashMap<>(), username, ACCESS_TOKEN_EXPIRATION);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(String username) {
+        return createToken(new HashMap<>(), username, REFRESH_TOKEN_EXPIRATION);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject, long expiration) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
