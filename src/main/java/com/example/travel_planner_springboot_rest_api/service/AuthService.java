@@ -32,8 +32,13 @@ public class AuthService {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
-            String accessToken = jwtTokenUtil.generateAccessToken(userOpt.get().getEmail());
-            String refreshToken = jwtTokenUtil.generateRefreshToken(userOpt.get().getEmail());
+            User user = userOpt.get();
+            String accessToken = jwtTokenUtil.generateAccessToken(user.getEmail());
+            String refreshToken = jwtTokenUtil.generateRefreshToken(user.getEmail());
+
+            // Save the refresh token in the database
+            user.setRefreshToken(refreshToken);
+            userRepository.save(user);
 
             Map<String, Object> response = new HashMap<>();
             response.put("accessToken", accessToken);
@@ -43,5 +48,16 @@ public class AuthService {
             return response;
         }
         throw new RuntimeException("Invalid credentials");
+    }
+
+    public void logout(String refreshToken) {
+        Optional<User> userOpt = userRepository.findByRefreshToken(refreshToken);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setRefreshToken(null); // Invalidate the refresh token
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("Invalid refresh token");
+        }
     }
 }
