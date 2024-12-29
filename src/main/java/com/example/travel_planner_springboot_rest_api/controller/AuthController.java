@@ -34,20 +34,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, Object>> refresh(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
-
-        String username = jwtTokenUtil.extractUsername(refreshToken);
-        if (jwtTokenUtil.validateToken(refreshToken, username)) {
-            String accessToken = jwtTokenUtil.generateAccessToken(username);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("accessToken", accessToken);
-            response.put("refreshToken", refreshToken); // Optionally refresh this too
-            response.put("expiresIn", 3600); // 1 hour
-
-            return ResponseEntity.ok(response);
-        }
-
-        throw new RuntimeException("Invalid refresh token");
+        return ResponseEntity.ok(authService.refreshToken(refreshToken));
     }
 
     @PostMapping("/logout")
