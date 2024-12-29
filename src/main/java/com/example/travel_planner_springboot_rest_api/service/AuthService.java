@@ -50,6 +50,33 @@ public class AuthService {
         throw new RuntimeException("Invalid credentials");
     }
 
+    public Map<String, Object> refreshToken(String refreshToken) {
+        Optional<User> userOpt = userRepository.findByRefreshToken(refreshToken);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            // Validate if the refresh token matches and is not expired
+            if (jwtTokenUtil.validateToken(refreshToken, user.getEmail())) {
+                String newAccessToken = jwtTokenUtil.generateAccessToken(user.getEmail());
+                String newRefreshToken = jwtTokenUtil.generateRefreshToken(user.getEmail());
+
+                // Update refresh token in the database (token rotation)
+                user.setRefreshToken(newRefreshToken);
+                userRepository.save(user);
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("accessToken", newAccessToken);
+                response.put("refreshToken", newRefreshToken);
+                response.put("expiresIn", 3600); // 1 hour
+
+                return response;
+            }
+        }
+
+        throw new RuntimeException("Invalid or expired refresh token");
+    }
+
     public void logout(String refreshToken) {
         Optional<User> userOpt = userRepository.findByRefreshToken(refreshToken);
         if (userOpt.isPresent()) {
