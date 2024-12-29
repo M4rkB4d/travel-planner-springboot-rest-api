@@ -49,4 +49,11 @@ public class AuthController {
 
         throw new RuntimeException("Invalid refresh token");
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        authService.logout(refreshToken);
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }
