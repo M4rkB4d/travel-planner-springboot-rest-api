@@ -43,7 +43,7 @@ public class AuthService {
             Map<String, Object> response = new HashMap<>();
             response.put("accessToken", accessToken);
             response.put("refreshToken", refreshToken);
-            response.put("expiresIn", 3600); // 1 hour
+            response.put("expiresIn", 900); // 15 minutes
 
             return response;
         }
@@ -68,9 +68,11 @@ public class AuthService {
                 Map<String, Object> response = new HashMap<>();
                 response.put("accessToken", newAccessToken);
                 response.put("refreshToken", newRefreshToken);
-                response.put("expiresIn", 3600); // 1 hour
+                response.put("expiresIn", 900); // 15 minutes
 
                 return response;
+            } else {
+                System.out.println("Refresh token replay attack detected for user: " + user.getEmail());
             }
         }
 
