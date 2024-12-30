@@ -18,8 +18,8 @@ public class JwtTokenUtil {
     private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(
             "a2uIfiIoTNM4+TunIiQjyuRPaLvtnbtncEFNo6A9TnU="));
 
-    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1 hour
-    private final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 days
+    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 minutes
+    private final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1 hour
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -57,8 +57,13 @@ public class JwtTokenUtil {
     }
 
     public boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        try {
+            final String extractedUsername = extractUsername(token);
+            return (extractedUsername.equals(username) && !isTokenExpired(token));
+        } catch (Exception e) {
+            System.out.println("Token validation failed: " + e.getMessage());
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
