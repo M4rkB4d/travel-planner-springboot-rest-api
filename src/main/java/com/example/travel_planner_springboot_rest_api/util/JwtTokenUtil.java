@@ -69,4 +69,14 @@ public class JwtTokenUtil {
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
+
+    public boolean isAccessToken(String token) {
+        Claims claims = extractAllClaims(token);
+        long expirationTime = claims.getExpiration().getTime();
+        long issuedAt = claims.getIssuedAt().getTime();
+        long tokenDuration = expirationTime - issuedAt;
+
+        // Check if the token duration matches access token duration (15 min)
+        return tokenDuration == ACCESS_TOKEN_EXPIRATION;
+    }
 }
