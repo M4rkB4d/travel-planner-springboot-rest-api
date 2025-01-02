@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             System.out.println("No Authorization header or invalid format.");
-            chain.doFilter(request, response);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header missing or invalid format");
             return;
         }
 
@@ -45,16 +45,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtTokenUtil.extractUsername(token);
         } catch (Exception e) {
             System.out.println("Invalid JWT Token: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+            return;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtTokenUtil.validateToken(token, username)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(username, null, null);
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                System.out.println("Authentication set for user: " + username);
+                // Check token expiration
+                if (jwtTokenUtil.isAccessToken(token)) { // Ensure it's an access token
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(username, null, null);
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    System.out.println("Authentication set for user: " + username);
+                    System.out.println("Authentication in SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
+                } else {
+                    System.out.println("Refresh token used in protected endpoint!");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token type for this endpoint");
+                    return;
+                }
             } else {
                 System.out.println("Token validation failed!");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token validation failed");
+                return;
             }
         }
 
