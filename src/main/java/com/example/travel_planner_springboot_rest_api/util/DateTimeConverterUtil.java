@@ -16,7 +16,11 @@ public class DateTimeConverterUtil {
         return dateTime.toInstant();
     }
 
-    public ZonedDateTime getCurrentDateTime() {
+    public ZonedDateTime getCurrentZonedDateTime() {
         return getZonedDateTime(Instant.now());
+    }
+
+    public Instant getCurrentInstantDateTime() {
+        return getInstantDateTime(ZonedDateTime.now());
     }
 }
