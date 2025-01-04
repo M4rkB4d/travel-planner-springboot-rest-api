@@ -39,6 +39,31 @@ public class Trip {
         this.isShared = isShared;
     }
 
+    public Trip(
+            String userId,
+            String title,
+            String destination,
+            ZonedDateTime startDate,
+            ZonedDateTime endDate,
+            List<Activity> activities,
+            Budget budget,
+            boolean isShared,
+            Instant createdAt,
+            Instant updatedAt
+    )
+    {
+        this.userId = userId;
+        this.title = title;
+        this.destination = destination;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activities = activities;
+        this.budget = budget;
+        this.isShared = isShared;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     @Id
     private String id;
     private String userId;
