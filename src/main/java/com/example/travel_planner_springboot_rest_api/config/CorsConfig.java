@@ -16,6 +16,7 @@ public class CorsConfig {
                         .allowedOrigins("http://localhost:5173") // Allow frontend origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
                         .allowedHeaders("*") // Allow all headers
+                        .exposedHeaders("X-CSP-Nonce")
                         .allowCredentials(true); // Allow cookies/session
                 // For Production use
 //                registry.addMapping("/**")
