@@ -25,9 +25,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // Skip JWT processing for login and registration endpoints
+        // Skip JWT processing for login, registration, and nonce endpoints
         String requestPath = request.getRequestURI();
-        if (requestPath.startsWith("/api/auth/")) {
+        if (requestPath.startsWith("/api/auth/") || requestPath.equals("/api/nonce")) {
             chain.doFilter(request, response);
             return;
         }
